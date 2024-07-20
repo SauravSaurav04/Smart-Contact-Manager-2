@@ -2,7 +2,10 @@ package com.scm.controllers;
 
 import com.scm.entities.User;
 import com.scm.forms.UserForm;
+import com.scm.helper.Message;
+import com.scm.helper.MessageType;
 import com.scm.services.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,7 +62,7 @@ public class PageController {
     }
 
     @RequestMapping(value = "/do-register", method = RequestMethod.POST)
-    public String processRegister(@ModelAttribute UserForm userForm) {
+    public String processRegister(@ModelAttribute UserForm userForm, HttpSession session) {
         System.out.println("Processing registration");
         System.out.println(userForm);
 
@@ -76,6 +79,10 @@ public class PageController {
         System.out.println("user saved :");
 
         // message = "Registration Successful"
+        Message message = Message.builder()
+                .content("Registration Successful").type(MessageType.blue).build();
+
+        session.setAttribute("message", message);
 
         // redirection login page
         return "redirect:/register";
