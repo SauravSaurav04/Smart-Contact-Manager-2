@@ -13,8 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class User {
     @Id
+    @Column(name = "ID")
     private String userId;
     @Column(name = "user_name", nullable = false)
     private String name;
@@ -30,6 +32,7 @@ public class User {
     private boolean emailVerified = false;
     private boolean phoneVerified = false;
     // SELF, GOOGLE, FACEBOOK, TWITTER, LINKEDIN, GITHUB
+    @Enumerated(value = EnumType.STRING)
     private Providers provider = Providers.SELF;
     private String providerUserId;
 
