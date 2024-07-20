@@ -1,31 +1,54 @@
 package com.scm.config;
 
+import com.scm.services.SecurityCustomUserDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
 
-    // user create and login using java code with in memory service
+    @Autowired
+    SecurityCustomUserDetailService securityCustomUserDetailService;
     @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails userDetails1 = User
-//                .withDefaultPasswordEncoder()
-                .withUsername("user")
-                .password("user")
-                .build();
+    public DaoAuthenticationProvider authenticationProvider(){
 
-        UserDetails userDetails2 = User
-//                .withDefaultPasswordEncoder()
-                .withUsername("admin123")
-                .password("admin123")
-                .roles("ADMIN", "USER")
-                .build();
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
 
-        return new InMemoryUserDetailsManager(userDetails1, userDetails2);
+        daoAuthenticationProvider.setUserDetailsService(securityCustomUserDetailService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        // urls configure kiay hai ki koun se public rangenge aur koun se private
+        // rangenge
+        httpSecurity.authorizeHttpRequests(authorize -> {
+            // authorize.requestMatchers("/home", "/register", "/services").permitAll();
+            authorize.requestMatchers("/user/**").authenticated();
+            authorize.anyRequest().permitAll();
+        });
+
+        // form default login
+        // agar hame kuch bhi change karna hua to hama yaha ayenge: form login se
+        // related
+        httpSecurity.formLogin(Customizer.withDefaults());
+
+        return httpSecurity.build();
     }
 }
