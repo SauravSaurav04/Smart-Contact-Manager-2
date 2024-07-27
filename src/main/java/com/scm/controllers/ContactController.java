@@ -7,6 +7,7 @@ import com.scm.helper.Helper;
 import com.scm.helper.Message;
 import com.scm.helper.MessageType;
 import com.scm.services.ContactService;
+import com.scm.services.ImageService;
 import com.scm.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.UUID;
+
 @Controller
 @RequestMapping("/user/contacts")
 public class ContactController {
@@ -27,6 +30,8 @@ public class ContactController {
     UserService userService;
     @Autowired
     ContactService contactService;
+    @Autowired
+    ImageService imageService;
 
     @RequestMapping("/add")
     public String addContactView(Model model) {
@@ -52,6 +57,9 @@ public class ContactController {
         String username = Helper.getEmailOfLoggedInUser(authentication);
         User user = userService.getUserByEmail(username);
 
+        String fileName = UUID.randomUUID().toString();
+        String fileURL = imageService.uploadImage(contactForm.getContactImage(), fileName);
+
         Contact contact = new Contact();
         contact.setName(contactForm.getName());
         contact.setFavorite(contactForm.isFavorite());
@@ -62,6 +70,9 @@ public class ContactController {
         contact.setUser(user);
         contact.setLinkedInLink(contactForm.getLinkedInLink());
         contact.setWebsiteLink(contactForm.getWebsiteLink());
+        contact.setPicture(fileURL);
+        contact.setCloudinaryImagePublicId(fileName);
+
         contactService.save(contact);
 
         session.setAttribute("message",

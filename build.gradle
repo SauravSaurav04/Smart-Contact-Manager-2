@@ -38,6 +38,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+
 }
 
 tasks.named('test') {

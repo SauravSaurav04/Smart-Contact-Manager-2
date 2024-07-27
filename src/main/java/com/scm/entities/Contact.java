@@ -28,6 +28,8 @@ public class Contact {
     private String websiteLink;
     private String linkedInLink;
 
+    public String cloudinaryImagePublicId;
+
     @ManyToOne
     private User user;
 
